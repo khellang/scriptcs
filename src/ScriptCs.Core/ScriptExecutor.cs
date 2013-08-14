@@ -10,30 +10,55 @@ namespace ScriptCs
 {
     public class ScriptExecutor : IScriptExecutor
     {
-        public static readonly string[] DefaultReferences = new[] { "System", "System.Core", "System.Data", "System.Data.DataSetExtensions", "System.Xml", "System.Xml.Linq" };
-        public static readonly string[] DefaultNamespaces = new[] { "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "System.IO" };
-
-        public IFileSystem FileSystem { get; private set; }
-        public IFilePreProcessor FilePreProcessor { get; private set; }
-        public IScriptEngine ScriptEngine { get; private set; }
-        public ILog Logger { get; private set; }
-        public Collection<string> References { get; private set; }
-        public Collection<string> Namespaces { get; private set; }
-        public ScriptPackSession ScriptPackSession { get; protected set; }
-
-        public ScriptExecutor(IFileSystem fileSystem, IFilePreProcessor filePreProcessor, IScriptEngine scriptEngine, ILog logger)
+        public static readonly string[] DefaultReferences =
         {
-            References = new Collection<string>();
-            AddReferences(DefaultReferences);
-            Namespaces = new Collection<string>();
-            ImportNamespaces(DefaultNamespaces);
+            "System", 
+            "System.Xml", 
+            "System.Core", 
+            "System.Data", 
+            "System.Xml.Linq",
+            "System.Data.DataSetExtensions" 
+        };
+
+        public static readonly string[] DefaultNamespaces =
+        {
+            "System",
+            "System.IO",
+            "System.Linq", 
+            "System.Text", 
+            "System.Threading.Tasks", 
+            "System.Collections.Generic" 
+        };
+
+        public ScriptPackSession ScriptPackSession;
+
+        public ScriptExecutor(
+            IFileSystem fileSystem,
+            IFilePreProcessor filePreProcessor,
+            IScriptEngine scriptEngine,
+            ILog logger)
+        {
+            References = new Collection<string>(DefaultReferences);
+            Namespaces = new Collection<string>(DefaultNamespaces);
             FileSystem = fileSystem;
             FilePreProcessor = filePreProcessor;
             ScriptEngine = scriptEngine;
             Logger = logger;
         }
 
-        public void ImportNamespaces(params string[] namespaces)
+        public Collection<string> References { get; private set; }
+
+        public Collection<string> Namespaces { get; private set; }
+
+        public IFileSystem FileSystem { get; private set; }
+
+        public IFilePreProcessor FilePreProcessor { get; private set; }
+
+        public IScriptEngine ScriptEngine { get; private set; }
+
+        public ILog Logger { get; private set; }
+
+        public void ImportNamespaces(IEnumerable<string> namespaces)
         {
             Guard.AgainstNullArgument("namespaces", namespaces);
 
@@ -44,7 +69,7 @@ namespace ScriptCs
         }
 
 
-        public void AddReferences(params string[] paths)
+        public void AddReferences(IEnumerable<string> paths)
         {
             Guard.AgainstNullArgument("paths", paths);
 
@@ -54,7 +79,7 @@ namespace ScriptCs
             }
         }
 
-        public void RemoveReferences(params string[] paths)
+        public void RemoveReferences(IEnumerable<string> paths)
         {
             Guard.AgainstNullArgument("paths", paths);
             
@@ -64,7 +89,7 @@ namespace ScriptCs
             }
         }
 
-        public void RemoveNamespaces(params string[] namespaces)
+        public void RemoveNamespaces(IEnumerable<string> namespaces)
         {
             Guard.AgainstNullArgument("namespaces", namespaces);
 
@@ -82,10 +107,9 @@ namespace ScriptCs
             ScriptEngine.BaseDirectory = bin;
 
             Logger.Debug("Initializing script packs");
-            var scriptPackSession = new ScriptPackSession(scriptPacks);
+            ScriptPackSession = new ScriptPackSession(scriptPacks);
 
-            scriptPackSession.InitializePacks();
-            ScriptPackSession = scriptPackSession;
+            ScriptPackSession.InitializePacks();
         }
 
         public virtual void Terminate()
@@ -96,18 +120,19 @@ namespace ScriptCs
 
         public virtual ScriptResult Execute(string script, params string[] scriptArgs)
         {
-            var path = Path.IsPathRooted(script) ? script : Path.Combine(FileSystem.CurrentDirectory, script);
-            var result = FilePreProcessor.ProcessFile(path);
-            var references = References.Union(result.References);
-            var namespaces = Namespaces.Union(result.Namespaces);
-
-            Logger.Debug("Starting execution in engine");
-            return ScriptEngine.Execute(result.Code, scriptArgs, references, namespaces, ScriptPackSession);
+            var rootedPath = Path.IsPathRooted(script) ? script : Path.Combine(FileSystem.CurrentDirectory, script);
+            return ExecuteInternal(() => FilePreProcessor.ProcessFile(rootedPath), scriptArgs);
         }
 
         public virtual ScriptResult ExecuteScript(string script, params string[] scriptArgs)
         {
-            var result = FilePreProcessor.ProcessScript(script);
+            return ExecuteInternal(() => FilePreProcessor.ProcessScript(script), scriptArgs);
+        }
+
+        private ScriptResult ExecuteInternal(Func<FilePreProcessorResult> process, params string[] scriptArgs)
+        {
+            var result = process();
+
             var references = References.Union(result.References);
             var namespaces = Namespaces.Union(result.Namespaces);
 

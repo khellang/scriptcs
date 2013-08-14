@@ -50,7 +50,7 @@ namespace ScriptCs
                 {
                     var assemblyName = PreProcessorUtil.GetPath(PreProcessorUtil.RString, script);
                     var assemblyPath = FileSystem.GetFullPath(Path.Combine(Constants.BinFolder, assemblyName));
-                    AddReferences(FileSystem.FileExists(assemblyPath) ? assemblyPath : assemblyName);
+                    this.AddReferences(FileSystem.FileExists(assemblyPath) ? assemblyPath : assemblyName);
 
                     return new ScriptResult();
                 }
@@ -92,7 +92,7 @@ namespace ScriptCs
             }
             catch (FileNotFoundException fileEx)
             {
-                RemoveReferences(fileEx.FileName);
+                this.RemoveReferences(fileEx.FileName);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\r\n" + fileEx + "\r\n");
                 return new ScriptResult { CompileExceptionInfo = ExceptionDispatchInfo.Capture(fileEx) };
