@@ -47,10 +47,17 @@ namespace ScriptCs
 
             if (_runtimeServices == null)
             {
-                _runtimeServices = new RuntimeServices(_logger, Overrides, LineProcessors, _console,
-                                                                       _scriptEngineType, _scriptExecutorType,
-                                                                       initDirectoryCatalog,
-                                                                       _initializationServices, _scriptName);
+                _runtimeServices = new RuntimeServices(
+                    _logger,
+                    Overrides,
+                    LineProcessors,
+                    FileBodyProcessors,
+                    _console,
+                    _scriptEngineType,
+                    _scriptExecutorType,
+                    initDirectoryCatalog,
+                    _initializationServices,
+                    _scriptName);
             }
 
             return _runtimeServices.GetScriptServices();

@@ -14,7 +14,7 @@
             get { return string.Format("#{0} ", DirectiveName); }
         }
 
-        public bool ProcessLine(IFileParser parser, FileParserContext context, string line, bool isBeforeCode)
+        public bool ProcessLine(IScriptParser parser, ScriptParserContext context, string line, bool isBeforeCode)
         {
             if (!IsDirective(line))
             {
@@ -37,7 +37,7 @@
                 .Replace(";", string.Empty);
         }
 
-        protected abstract bool ProcessLine(IFileParser parser, FileParserContext context, string line);
+        protected abstract bool ProcessLine(IScriptParser parser, ScriptParserContext context, string line);
 
         private bool IsDirective(string line)
         {

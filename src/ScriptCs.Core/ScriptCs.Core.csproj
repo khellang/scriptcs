@@ -36,7 +36,7 @@
     <Compile Include="..\..\common\CommonVersionInfo.cs">
       <Link>Properties\CommonVersionInfo.cs</Link>
     </Compile>
-    <Compile Include="FilePreProcessor.cs" />
+    <Compile Include="ScriptProcessor.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="ILoggerConfigurator.cs" />

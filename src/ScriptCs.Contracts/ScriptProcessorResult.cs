@@ -2,9 +2,9 @@
 
 namespace ScriptCs.Contracts
 {
-    public class FilePreProcessorResult
+    public class ScriptProcessorResult
     {
-        public FilePreProcessorResult()
+        public ScriptProcessorResult()
         {
             Namespaces = new List<string>();
             LoadedScripts = new List<string>();

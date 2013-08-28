@@ -27,7 +27,7 @@ namespace ScriptCs
             get { return true; }
         }
 
-        protected override bool ProcessLine(IFileParser parser, FileParserContext context, string line)
+        protected override bool ProcessLine(IScriptParser parser, ScriptParserContext context, string line)
         {
             var argument = GetDirectiveArgument(line);
             var assemblyPath = Environment.ExpandEnvironmentVariables(argument);

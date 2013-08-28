@@ -15,7 +15,7 @@ namespace ScriptCs
 
         public IFileSystem FileSystem { get; private set; }
         
-        public IFilePreProcessor FilePreProcessor { get; private set; }
+        public IScriptProcessor ScriptProcessor { get; private set; }
 
         public IScriptEngine ScriptEngine { get; private set; }
 
@@ -27,14 +27,14 @@ namespace ScriptCs
 
         public ScriptPackSession ScriptPackSession { get; protected set; }
 
-        public ScriptExecutor(IFileSystem fileSystem, IFilePreProcessor filePreProcessor, IScriptEngine scriptEngine, ILog logger)
+        public ScriptExecutor(IFileSystem fileSystem, IScriptProcessor scriptProcessor, IScriptEngine scriptEngine, ILog logger)
         {
             References = new Collection<string>();
             AddReferences(DefaultReferences);
             Namespaces = new Collection<string>();
             ImportNamespaces(DefaultNamespaces);
             FileSystem = fileSystem;
-            FilePreProcessor = filePreProcessor;
+            ScriptProcessor = scriptProcessor;
             ScriptEngine = scriptEngine;
             Logger = logger;
         }
@@ -102,7 +102,7 @@ namespace ScriptCs
         public virtual ScriptResult Execute(string script, params string[] scriptArgs)
         {
             var path = Path.IsPathRooted(script) ? script : Path.Combine(FileSystem.CurrentDirectory, script);
-            var result = FilePreProcessor.ProcessFile(path);
+            var result = ScriptProcessor.ProcessFile(path);
             var references = References.Union(result.References);
             var namespaces = Namespaces.Union(result.Namespaces);
             ScriptEngine.FileName = Path.GetFileName(path);
@@ -113,7 +113,7 @@ namespace ScriptCs
 
         public virtual ScriptResult ExecuteScript(string script, params string[] scriptArgs)
         {
-            var result = FilePreProcessor.ProcessScript(script);
+            var result = ScriptProcessor.ProcessScript(script);
             var references = References.Union(result.References);
             var namespaces = Namespaces.Union(result.Namespaces);
 

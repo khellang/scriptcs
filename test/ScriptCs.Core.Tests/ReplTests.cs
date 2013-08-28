@@ -23,7 +23,7 @@ namespace ScriptCs.Tests
                 Logger = new Mock<ILog>();
                 Console = new Mock<IConsole>();
                 ScriptPack = new Mock<IScriptPack>();
-                FilePreProcessor = new Mock<IFilePreProcessor>();
+                ScriptProcessor = new Mock<IScriptProcessor>();
             }
 
             public Mock<IFileSystem> FileSystem { get; private set; }
@@ -36,12 +36,12 @@ namespace ScriptCs.Tests
 
             public Mock<IScriptPack> ScriptPack { get; private set; }
 
-            public Mock<IFilePreProcessor> FilePreProcessor { get; private set; }
+            public Mock<IScriptProcessor> ScriptProcessor { get; private set; }
         }
 
         public static Repl GetRepl(Mocks mocks)
         {
-            return new Repl(new string[0], mocks.FileSystem.Object, mocks.ScriptEngine.Object, mocks.Logger.Object, mocks.Console.Object, mocks.FilePreProcessor.Object);
+            return new Repl(new string[0], mocks.FileSystem.Object, mocks.ScriptEngine.Object, mocks.Logger.Object, mocks.Console.Object, mocks.ScriptProcessor.Object);
         }
 
         public class TheConstructor
@@ -137,8 +137,8 @@ namespace ScriptCs.Tests
             public TheExecuteMethod()
             {
                 _mocks = new Mocks();
-                _mocks.FilePreProcessor.Setup(x => x.ProcessScript("foo"))
-                    .Returns(new FilePreProcessorResult { Code = "foo" });
+                _mocks.ScriptProcessor.Setup(x => x.ProcessScript("foo"))
+                    .Returns(new ScriptProcessorResult { Code = "foo" });
                 _repl = GetRepl(_mocks);
                 _repl.Console.ForegroundColor = ConsoleColor.White;
                 _repl.Execute("foo");
@@ -190,15 +190,15 @@ namespace ScriptCs.Tests
                 _repl = GetRepl(mocks);
                 _repl.Execute("#load \"file.csx\"");
 
-                mocks.FilePreProcessor.Verify(i => i.ProcessScript("#load \"file.csx\""), Times.Once());
+                mocks.ScriptProcessor.Verify(i => i.ProcessScript("#load \"file.csx\""), Times.Once());
             }
 
             [Fact]
             public void ShouldExecuteLoadedFileIfLineIsALoad()
             {
                 var mocks = new Mocks();
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                     .Returns(new FilePreProcessorResult());
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                     .Returns(new ScriptProcessorResult());
                 mocks.FileSystem.Setup(x => x.FileExists("file.csx")).Returns(true);
 
                 _repl = GetRepl(mocks);
@@ -226,8 +226,8 @@ namespace ScriptCs.Tests
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 mocks.FileSystem.Setup(i => i.GetFullPath(It.IsAny<string>())).Returns(@"c:/my.dll");
                 mocks.FileSystem.Setup(x => x.FileExists("c:/my.dll")).Returns(true);
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { References = new List<string> { "my.dll" } });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { References = new List<string> { "my.dll" } });
 
                 _repl = GetRepl(mocks);
                 _repl.Initialize(Enumerable.Empty<string>(), Enumerable.Empty<IScriptPack>());
@@ -243,8 +243,8 @@ namespace ScriptCs.Tests
                 var mocks = new Mocks();
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 mocks.FileSystem.Setup(i => i.GetFullPath(It.IsAny<string>())).Returns(@"C:/my.dll");
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { References = new List<string> { "my.dll" } });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { References = new List<string> { "my.dll" } });
 
                 _repl = GetRepl(mocks);
                 _repl.Initialize(Enumerable.Empty<string>(), Enumerable.Empty<IScriptPack>());
@@ -259,8 +259,8 @@ namespace ScriptCs.Tests
                 var mocks = new Mocks();
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 mocks.FileSystem.Setup(i => i.FileExists(It.IsAny<string>())).Returns(false);
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { References = new List<string> { "PresentationCore" } });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { References = new List<string> { "PresentationCore" } });
 
                 _repl = GetRepl(mocks);
                 _repl.Initialize(Enumerable.Empty<string>(), Enumerable.Empty<IScriptPack>());
@@ -276,8 +276,8 @@ namespace ScriptCs.Tests
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 mocks.FileSystem.Setup(i => i.GetFullPath(It.IsAny<string>())).Returns(@"C:/my.dll");
                 mocks.FileSystem.Setup(i => i.FileExists(It.IsAny<string>())).Returns(false);
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { References = new List<string> { "my.dll" } });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { References = new List<string> { "my.dll" } });
 
                 _repl = GetRepl(mocks);
                 _repl.Initialize(Enumerable.Empty<string>(), Enumerable.Empty<IScriptPack>());
@@ -293,8 +293,8 @@ namespace ScriptCs.Tests
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 mocks.FileSystem.Setup(i => i.GetFullPath(It.IsAny<string>())).Returns(@"C:/my.dll");
                 mocks.FileSystem.Setup(i => i.FileExists(It.IsAny<string>())).Returns(false);
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { References = new List<string> { "my.dll" } });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { References = new List<string> { "my.dll" } });
                 mocks.ScriptEngine.Setup(
                     i =>
                     i.Execute(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<IEnumerable<string>>(),
@@ -332,8 +332,8 @@ namespace ScriptCs.Tests
                          ExpectingClosingChar = ')',
                          IsPendingClosingChar = true
                      });
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { Code = "var x = 1;" });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { Code = "var x = 1;" });
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 _repl = GetRepl(mocks);
                 _repl.Initialize(Enumerable.Empty<string>(), Enumerable.Empty<IScriptPack>());
@@ -354,8 +354,8 @@ namespace ScriptCs.Tests
                      {
                          IsPendingClosingChar = false
                      });
-                mocks.FilePreProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
-                    .Returns(new FilePreProcessorResult { Code = "}" });
+                mocks.ScriptProcessor.Setup(x => x.ProcessScript(It.IsAny<string>()))
+                    .Returns(new ScriptProcessorResult { Code = "}" });
                 mocks.FileSystem.Setup(i => i.CurrentDirectory).Returns("C:/");
                 _repl = GetRepl(mocks);
                 _repl.Buffer = "class test {";

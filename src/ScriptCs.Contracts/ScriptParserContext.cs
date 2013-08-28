@@ -2,9 +2,9 @@
 
 namespace ScriptCs.Contracts
 {
-    public class FileParserContext
+    public class ScriptParserContext
     {
-        public FileParserContext()
+        public ScriptParserContext()
         {
             Namespaces = new List<string>();
             References = new List<string>();

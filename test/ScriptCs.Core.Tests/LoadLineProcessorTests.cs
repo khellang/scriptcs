@@ -26,26 +26,26 @@ namespace ScriptCs.Tests
             }
 
             [Theory, ScriptCsAutoData]
-            public void ShouldReturnTrueOnLoadLine(IFileParser parser, LoadLineProcessor processor)
+            public void ShouldReturnTrueOnLoadLine(IScriptParser parser, LoadLineProcessor processor)
             {
                 // Arrange
                 const string Line = @"#load ""script.csx""";
 
                 // Act
-                var result = processor.ProcessLine(parser, new FileParserContext(), Line, true);
+                var result = processor.ProcessLine(parser, new ScriptParserContext(), Line, true);
 
                 // Assert
                 result.ShouldBeTrue();
             }
 
             [Theory, ScriptCsAutoData]
-            public void ShouldReturnFalseOtherwise(IFileParser parser, LoadLineProcessor processor)
+            public void ShouldReturnFalseOtherwise(IScriptParser parser, LoadLineProcessor processor)
             {
                 // Arrange
                 const string Line = @"var x = new Test();";
 
                 // Act
-                var result = processor.ProcessLine(parser, new FileParserContext(), Line, true);
+                var result = processor.ProcessLine(parser, new ScriptParserContext(), Line, true);
 
                 // Assert
                 result.ShouldBeFalse();
@@ -53,12 +53,12 @@ namespace ScriptCs.Tests
 
             [Theory, ScriptCsAutoData]
             public void ShouldReturnTrueButNotParseFileIfAfterCode(
-                [Frozen] Mock<IFileParser> parser,
+                [Frozen] Mock<IScriptParser> parser,
                 [Frozen] Mock<IFileSystem> fileSystem,
                 LoadLineProcessor processor)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
 
                 const string RelativePath = "..\\script.csx";
                 const string Line = @"#load " + RelativePath;
@@ -71,17 +71,17 @@ namespace ScriptCs.Tests
 
                 // Assert
                 result.ShouldBeTrue();
-                parser.Verify(x => x.ParseFile(FullPath, It.IsAny<FileParserContext>()), Times.Never());
+                parser.Verify(x => x.ParseFile(FullPath, It.IsAny<ScriptParserContext>()), Times.Never());
             }
 
             [Theory, ScriptCsAutoData]
             public void ShouldParseLoadedFile(
-                [Frozen] Mock<IFileParser> parser,
+                [Frozen] Mock<IScriptParser> parser,
                 [Frozen] Mock<IFileSystem> fileSystem,
                 LoadLineProcessor processor)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
 
                 const string RelativePath = "..\\script.csx";
                 const string Line = @"#load " + RelativePath;
@@ -93,17 +93,17 @@ namespace ScriptCs.Tests
                 processor.ProcessLine(parser.Object, context, Line, true);
 
                 // Assert
-                parser.Verify(x => x.ParseFile(FullPath, It.IsAny<FileParserContext>()));
+                parser.Verify(x => x.ParseFile(FullPath, It.IsAny<ScriptParserContext>()));
             }
 
             [Theory, ScriptCsAutoData]
             public void ShouldExpandEnvironmentVariables(
                 [Frozen] Mock<IFileSystem> fileSystem,
                 LoadLineProcessor processor,
-                IFileParser parser)
+                IScriptParser parser)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
                 var line = string.Format("#load %{0}%", EnvVarKey);
 
                 // Act

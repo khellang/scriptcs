@@ -17,7 +17,7 @@ namespace ScriptCs
             IScriptEngine scriptEngine,
             ILog logger,
             IConsole console,
-            IFilePreProcessor filePreProcessor) : base(fileSystem, filePreProcessor, scriptEngine, logger)
+            IScriptProcessor scriptProcessor) : base(fileSystem, scriptProcessor, scriptEngine, logger)
         {
             _scriptArgs = scriptArgs;
             Console = console;
@@ -38,7 +38,7 @@ namespace ScriptCs
         {
             try
             {
-                var preProcessResult = FilePreProcessor.ProcessScript(script);
+                var preProcessResult = ScriptProcessor.ProcessScript(script);
 
                 ImportNamespaces(preProcessResult.Namespaces.ToArray());
 

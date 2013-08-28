@@ -32,7 +32,7 @@ namespace ScriptCs.Tests
                 _scriptEngineType = mockScriptEngineType.Object.GetType();
 
                 var initializationServices = new InitializationServices(_mockLogger.Object, _overrides);
-                _runtimeServices = new RuntimeServices(_mockLogger.Object, _overrides, new List<Type>(),  _mockConsole.Object, _scriptEngineType, _scriptExecutorType, false, initializationServices, "script.csx");
+                _runtimeServices = new RuntimeServices(_mockLogger.Object, _overrides, new List<Type>(), new List<Type>(), _mockConsole.Object, _scriptEngineType, _scriptExecutorType, false, initializationServices, "script.csx");
             }
 
             [Fact]
@@ -75,9 +75,9 @@ namespace ScriptCs.Tests
             }
 
             [Fact]
-            public void ShouldRegisterTheDefaultFilePreProcessorIfNoOverride()
+            public void ShouldRegisterTheDefaultScriptProcessorIfNoOverride()
             {
-                _runtimeServices.Container.Resolve<IFilePreProcessor>().ShouldNotBeNull();
+                _runtimeServices.Container.Resolve<IScriptProcessor>().ShouldNotBeNull();
             }
 
             [Fact]
@@ -143,11 +143,11 @@ namespace ScriptCs.Tests
             }
 
             [Fact]
-            public void ShouldRegisterTheOverriddenFilePreProcessor()
+            public void ShouldRegisterTheOverriddenScriptProcessor()
             {
-                var mock = new Mock<IFilePreProcessor>();
-                _overrides[typeof(IFilePreProcessor)] = mock.Object.GetType();
-                _runtimeServices.Container.Resolve<IFilePreProcessor>().ShouldBeType(mock.Object.GetType());
+                var mock = new Mock<IScriptProcessor>();
+                _overrides[typeof(IScriptProcessor)] = mock.Object.GetType();
+                _runtimeServices.Container.Resolve<IScriptProcessor>().ShouldBeType(mock.Object.GetType());
             }
 
             [Fact]

@@ -75,7 +75,7 @@ namespace ScriptCs.Tests
             [Fact]
             public void MultipleUsingStatementsShouldProduceDistinctOutput()
             {
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 var splitOutput = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -87,7 +87,7 @@ namespace ScriptCs.Tests
             [Fact]
             public void UsingStateMentsShoulAllBeAtTheTop()
             {
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 var splitOutput = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -100,7 +100,7 @@ namespace ScriptCs.Tests
             [Fact]
             public void ShouldNotLoadInlineLoads()
             {
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 processor.ProcessFile("script1.csx");
 
                 _fileSystem.Verify(x => x.ReadFileLines(It.Is<string>(i => i == "script1.csx")), Times.Once());
@@ -112,7 +112,7 @@ namespace ScriptCs.Tests
             [Fact]
             public void ShouldReturnResultWithAllLoadedFiles()
             {
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 result.LoadedScripts.Count.ShouldEqual(3);
@@ -124,7 +124,7 @@ namespace ScriptCs.Tests
             [Fact]
             public void ShouldReturnResultWithAllUsings()
             {
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 result.Namespaces.Count.ShouldEqual(2);
@@ -153,7 +153,7 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "script1.csx"))).Returns(file1.ToArray());
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "scriptX.csx"))).Returns(file2.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 result.References.Count.ShouldEqual(2);
@@ -182,7 +182,7 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "script1.csx"))).Returns(file1.ToArray());
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "scriptX.csx"))).Returns(file2.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 result.Code.ShouldNotContain("#r");
@@ -205,7 +205,7 @@ namespace ScriptCs.Tests
                 fs.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "script4.csx")))
                   .Returns(_file4.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 processor.ProcessFile("script1.csx");
 
                 _fileSystem.Verify(x => x.ReadFileLines(It.Is<string>(i => i == "script1.csx")), Times.Once());
@@ -227,7 +227,7 @@ namespace ScriptCs.Tests
 
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "file.csx"))).Returns(file.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("file.csx");
 
                 var splitOutput = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -247,7 +247,7 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(x => x.ReadFileLines("A.csx")).Returns(a.ToArray());
                 _fileSystem.Setup(x => x.ReadFileLines("B.csx")).Returns(b.ToArray());
 
-                Assert.DoesNotThrow(() => GetFilePreProcessor().ProcessFile("A.csx"));
+                Assert.DoesNotThrow(() => GetScriptProcessor().ProcessFile("A.csx"));
             }
 
             [Fact]
@@ -262,7 +262,7 @@ namespace ScriptCs.Tests
 
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "file.csx"))).Returns(file.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("file.csx");
 
                 var splitOutput = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -290,7 +290,7 @@ namespace ScriptCs.Tests
                     };
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "file.csx"))).Returns(file.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("file.csx");
 
                 var splitOutput = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -324,7 +324,7 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(x => x.ReadFileLines(It.Is<string>(f => f == "scriptX.csx")))
                            .Returns(file2.ToArray());
 
-                var processor = GetFilePreProcessor();
+                var processor = GetScriptProcessor();
                 var result = processor.ProcessFile("script1.csx");
 
                 result.References.Count.ShouldEqual(2);
@@ -385,9 +385,9 @@ namespace ScriptCs.Tests
                             .Returns(f5.ToArray());
                 _fileSystem.Setup(fs => fs.IsPathRooted(It.IsAny<string>())).Returns(true);
 
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
 
-                var result = preProcessor.ProcessFile(@"C:\f1.csx");
+                var result = scriptProcessor.ProcessFile(@"C:\f1.csx");
 
                 var fileLines = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
@@ -465,9 +465,9 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(fs => fs.GetWorkingDirectory(@"C:\SubFolder\f2.csx")).Returns(@"C:\SubFolder\");
                 _fileSystem.Setup(fs => fs.GetWorkingDirectory(@"C:\SubFolder\f3.csx")).Returns(@"C:\SubFolder\");
 
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
 
-                var result = preProcessor.ProcessFile(@"C:\f1.csx");
+                var result = scriptProcessor.ProcessFile(@"C:\f1.csx");
 
                 _fileSystem.Verify(fs => fs.ReadFileLines(@"C:\f1.csx"), Times.Once());
                 _fileSystem.Verify(fs => fs.ReadFileLines(@"C:\SubFolder\f2.csx"), Times.Once());
@@ -500,14 +500,14 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(fs => fs.GetFullPath(@"C:\SubFolder\f1.csx")).Returns(@"C:\SubFolder\f1.csx");
                 _fileSystem.Setup(fs => fs.GetWorkingDirectory(@"C:\SubFolder\f1.csx")).Returns(@"C:\SubFolder\");
 
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
 
-                var result = preProcessor.ProcessFile(@"C:\f1.csx");
+                var result = scriptProcessor.ProcessFile(@"C:\f1.csx");
 
                 lastCurrentDirectory.ShouldBeSameAs(startingDirectory);
             }
 
-            private IFilePreProcessor GetFilePreProcessor()
+            private IScriptProcessor GetScriptProcessor()
             {
                 var lineProcessors = new ILineProcessor[]
                 {
@@ -516,7 +516,7 @@ namespace ScriptCs.Tests
                     new LoadLineProcessor(_fileSystem.Object)
                 };
 
-                return new FilePreProcessor(_fileSystem.Object, Mock.Of<ILog>(), lineProcessors);
+                return new ScriptProcessor(_fileSystem.Object, Mock.Of<ILog>(), lineProcessors, Enumerable.Empty<IFileBodyProcessor>());
             }
         }
         
@@ -534,10 +534,10 @@ namespace ScriptCs.Tests
             [Fact]
             public void ShouldSplitScriptIntoLines()
             {
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
                 var script = @"Console.WriteLine(""Testing..."");";
                 
-                preProcessor.ProcessScript(script);
+                scriptProcessor.ProcessScript(script);
 
                 _fileSystem.Verify(x => x.SplitLines(script), Times.Once());
             }
@@ -545,10 +545,10 @@ namespace ScriptCs.Tests
             [Fact]
             public void ShouldNotReadFromFile()
             {
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
                 var script = @"Console.WriteLine(""Testing..."");";
                 
-                preProcessor.ProcessScript(script);
+                scriptProcessor.ProcessScript(script);
 
                 _fileSystem.Verify(x => x.ReadFileLines(It.IsAny<string>()), Times.Never());
             }
@@ -561,16 +561,16 @@ namespace ScriptCs.Tests
                 _fileSystem.Setup(x => x.SplitLines(It.IsAny<string>()))
                     .Returns<string>(x => x.Split(new[] { Environment.NewLine }, StringSplitOptions.None));
 
-                var preProcessor = GetFilePreProcessor();
+                var scriptProcessor = GetScriptProcessor();
                 var script = @"#load script1.csx";
                 
-                var result = preProcessor.ProcessScript(script);
+                var result = scriptProcessor.ProcessScript(script);
                 var fileLines = result.Code.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
                 fileLines.Count(x => x.StartsWith("#line ")).ShouldEqual(1);
             }
 
-            private IFilePreProcessor GetFilePreProcessor()
+            private IScriptProcessor GetScriptProcessor()
             {
                 var lineProcessors = new ILineProcessor[]
                 {
@@ -579,7 +579,7 @@ namespace ScriptCs.Tests
                     new LoadLineProcessor(_fileSystem.Object)
                 };
 
-                return new FilePreProcessor(_fileSystem.Object, Mock.Of<ILog>(), lineProcessors);
+                return new ScriptProcessor(_fileSystem.Object, Mock.Of<ILog>(), lineProcessors, Enumerable.Empty<IFileBodyProcessor>());
             }
         }
     }

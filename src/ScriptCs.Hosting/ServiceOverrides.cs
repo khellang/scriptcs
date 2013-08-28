@@ -10,6 +10,8 @@ namespace ScriptCs
     {
         protected readonly IList<Type> LineProcessors = new List<Type>();
 
+        protected readonly IList<Type> FileBodyProcessors = new List<Type>();
+
         protected readonly IDictionary<Type, object> Overrides = new Dictionary<Type, object>();
 
         private readonly TConfig _this;
@@ -84,9 +86,9 @@ namespace ScriptCs
             return _this;
         }
 
-        public TConfig FilePreProcessor<T>() where T : IFilePreProcessor
+        public TConfig ScriptProcessor<T>() where T : IScriptProcessor
         {
-            Overrides[typeof(IFilePreProcessor)] = typeof(T);
+            Overrides[typeof(IScriptProcessor)] = typeof(T);
             return _this;
         }
 
@@ -105,6 +107,12 @@ namespace ScriptCs
         public TConfig LineProcessor<T>() where T : ILineProcessor
         {
             LineProcessors.Add(typeof(T));
+            return _this;
+        }
+
+        public TConfig FileBodyProcessor<T>() where T : IFileBodyProcessor
+        {
+            FileBodyProcessors.Add(typeof(T));
             return _this;
         }
     }

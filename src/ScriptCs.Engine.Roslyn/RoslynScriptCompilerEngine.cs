@@ -35,6 +35,7 @@ namespace ScriptCs.Engine.Roslyn
             catch (Exception compileException)
             {
                 scriptResult.CompileExceptionInfo = ExceptionDispatchInfo.Capture(compileException);
+                return scriptResult;
             }
 
             var exeBytes = new byte[0];

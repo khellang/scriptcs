@@ -11,7 +11,7 @@ namespace ScriptCs
             IPackageAssemblyResolver packageAssemblyResolver, 
             IScriptExecutor executor,
             IScriptEngine engine,
-            IFilePreProcessor filePreProcessor,
+            IScriptProcessor scriptProcessor,
             IScriptPackResolver scriptPackResolver, 
             IPackageInstaller packageInstaller,
             ILog logger,
@@ -23,7 +23,7 @@ namespace ScriptCs
             PackageAssemblyResolver = packageAssemblyResolver;
             Executor = executor;
             Engine = engine;
-            FilePreProcessor = filePreProcessor;
+            ScriptProcessor = scriptProcessor;
             ScriptPackResolver = scriptPackResolver;
             PackageInstaller = packageInstaller;
             Logger = logger;
@@ -39,7 +39,7 @@ namespace ScriptCs
         public IPackageInstaller PackageInstaller { get; private set; }
         public ILog Logger { get; private set; }
         public IScriptEngine Engine { get; private set; }
-        public IFilePreProcessor FilePreProcessor { get; private set; }
+        public IScriptProcessor ScriptProcessor { get; private set; }
         public IConsole Console { get; private set; }
         public IAssemblyResolver AssemblyResolver { get; private set; }
 		public IInstallationProvider InstallationProvider { get; private set; }

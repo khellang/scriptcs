@@ -16,6 +16,7 @@ namespace ScriptCs
     public class RuntimeServices : ScriptServicesRegistration, IRuntimeServices
     {
         private readonly IList<Type> _lineProcessors;
+        private readonly IList<Type> _fileBodyProcessors;
         private readonly IConsole _console;
         private readonly Type _scriptEngineType;
         private readonly Type _scriptExecutorType;
@@ -23,10 +24,21 @@ namespace ScriptCs
         private readonly IInitializationServices _initializationServices;
         private readonly string _scriptName;
 
-        public RuntimeServices(ILog logger, IDictionary<Type, object> overrides, IList<Type> lineProcessors, IConsole console, Type scriptEngineType, Type scriptExecutorType, bool initDirectoryCatalog, IInitializationServices initializationServices, string scriptName) : 
+        public RuntimeServices(
+            ILog logger,
+            IDictionary<Type, object> overrides,
+            IList<Type> lineProcessors,
+            IList<Type> fileBodyProcessors,
+            IConsole console,
+            Type scriptEngineType,
+            Type scriptExecutorType,
+            bool initDirectoryCatalog,
+            IInitializationServices initializationServices,
+            string scriptName) : 
             base(logger, overrides)
         {
             _lineProcessors = lineProcessors;
+            _fileBodyProcessors = fileBodyProcessors;
             _console = console;
             _scriptEngineType = scriptEngineType;
             _scriptExecutorType = scriptExecutorType;
@@ -48,13 +60,15 @@ namespace ScriptCs
 
             RegisterLineProcessors(builder);
 
+            builder.RegisterTypes(_fileBodyProcessors.ToArray()).As<IFileBodyProcessor>().SingleInstance();
+
             RegisterOverrideOrDefault<IFileSystem>(builder, b => b.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance());
             RegisterOverrideOrDefault<IAssemblyUtility>(builder, b => b.RegisterType<AssemblyUtility>().As<IAssemblyUtility>().SingleInstance());
             RegisterOverrideOrDefault<IPackageContainer>(builder, b => b.RegisterType<PackageContainer>().As<IPackageContainer>().SingleInstance());
             RegisterOverrideOrDefault<IPackageAssemblyResolver>(builder, b => b.RegisterType<PackageAssemblyResolver>().As<IPackageAssemblyResolver>().SingleInstance());
             RegisterOverrideOrDefault<IAssemblyResolver>(builder, b => b.RegisterType<AssemblyResolver>().As<IAssemblyResolver>().SingleInstance());
             RegisterOverrideOrDefault<IScriptHostFactory>(builder, b => b.RegisterType<ScriptHostFactory>().As<IScriptHostFactory>().SingleInstance());
-            RegisterOverrideOrDefault<IFilePreProcessor>(builder, b => b.RegisterType<FilePreProcessor>().As<IFilePreProcessor>().SingleInstance());
+            RegisterOverrideOrDefault<IScriptProcessor>(builder, b => b.RegisterType<ScriptProcessor>().As<IScriptProcessor>().SingleInstance());
             RegisterOverrideOrDefault<IScriptPackResolver>(builder, b => b.RegisterType<ScriptPackResolver>().As<IScriptPackResolver>().SingleInstance());
             RegisterOverrideOrDefault<IInstallationProvider>(builder, b => b.RegisterType<NugetInstallationProvider>().As<IInstallationProvider>().SingleInstance());
             RegisterOverrideOrDefault<IPackageInstaller>(builder, b => b.RegisterType<PackageInstaller>().As<IPackageInstaller>().SingleInstance());

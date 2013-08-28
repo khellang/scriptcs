@@ -10,7 +10,7 @@ namespace ScriptCs
     {
         private const string UsingString = "using ";
 
-        public bool ProcessLine(IFileParser parser, FileParserContext context, string line, bool isBeforeCode)
+        public bool ProcessLine(IScriptParser parser, ScriptParserContext context, string line, bool isBeforeCode)
         {
             if (!IsUsingLine(line))
             {

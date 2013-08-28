@@ -24,12 +24,14 @@
 
         TConfig PackageInstaller<T>() where T : IPackageInstaller;
 
-        TConfig FilePreProcessor<T>() where T : IFilePreProcessor;
+        TConfig ScriptProcessor<T>() where T : IScriptProcessor;
 
         TConfig PackageAssemblyResolver<T>() where T : IPackageAssemblyResolver;
 
         TConfig AssemblyResolver<T>() where T : IAssemblyResolver;
 
         TConfig LineProcessor<T>() where T : ILineProcessor;
+
+        TConfig FileBodyProcessor<T>() where T : IFileBodyProcessor;
     }
 }

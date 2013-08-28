@@ -22,26 +22,26 @@ namespace ScriptCs.Tests
             }
 
             [Theory, ScriptCsAutoData]
-            public void ShouldReturnTrueOnReferenceLine(IFileParser parser, ReferenceLineProcessor processor)
+            public void ShouldReturnTrueOnReferenceLine(IScriptParser parser, ReferenceLineProcessor processor)
             {
                 // Arrange
                 const string Line = @"#r ""MyDll.dll""";
 
                 // Act
-                var result = processor.ProcessLine(parser, new FileParserContext(), Line, true);
+                var result = processor.ProcessLine(parser, new ScriptParserContext(), Line, true);
 
                 // Assert
                 result.ShouldBeTrue();
             }
 
             [Theory, ScriptCsAutoData]
-            public void ShouldReturnFalseOtherwise(IFileParser parser, ReferenceLineProcessor processor)
+            public void ShouldReturnFalseOtherwise(IScriptParser parser, ReferenceLineProcessor processor)
             {
                 // Arrange
                 const string Line = @"var x = new Test();";
 
                 // Act
-                var result = processor.ProcessLine(parser, new FileParserContext(), Line, true);
+                var result = processor.ProcessLine(parser, new ScriptParserContext(), Line, true);
 
                 // Assert
                 result.ShouldBeFalse();
@@ -51,10 +51,10 @@ namespace ScriptCs.Tests
             public void ShouldReturnTrueButNotAddReferenceIfAfterCode(
                 [Frozen] Mock<IFileSystem> fileSystem,
                 ReferenceLineProcessor processor,
-                IFileParser parser)
+                IScriptParser parser)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
 
                 const string RelativePath = "..\\script.csx";
                 const string Line = @"#r " + RelativePath;
@@ -74,10 +74,10 @@ namespace ScriptCs.Tests
             public void ShouldAddReferenceToContext(
                 [Frozen] Mock<IFileSystem> fileSystem,
                 ReferenceLineProcessor processor,
-                IFileParser parser)
+                IScriptParser parser)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
 
                 const string RelativePath = "..\\Assembly.dll";
                 const string Line = @"#r " + RelativePath;
@@ -96,10 +96,10 @@ namespace ScriptCs.Tests
             public void ShouldAddReferenceByNameFromGACIfLocalFileDoesntExist(
                 [Frozen] Mock<IFileSystem> fileSystem,
                 ReferenceLineProcessor processor,
-                IFileParser parser)
+                IScriptParser parser)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
 
                 var name = "script.csx";
                 var line = @"#r " + name;
@@ -119,10 +119,10 @@ namespace ScriptCs.Tests
             public void ShouldExpandEnvironmentVariables(
                 [Frozen] Mock<IFileSystem> fileSystem,
                 ReferenceLineProcessor processor,
-                IFileParser parser)
+                IScriptParser parser)
             {
                 // Arrange
-                var context = new FileParserContext();
+                var context = new ScriptParserContext();
                 var line = string.Format("#r %{0}%", EnvVarKey);
 
                 // Act

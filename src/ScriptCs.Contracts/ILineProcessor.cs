@@ -2,6 +2,6 @@
 {
     public interface ILineProcessor
     {
-        bool ProcessLine(IFileParser parser, FileParserContext context, string line, bool isBeforeCode);
+        bool ProcessLine(IScriptParser parser, ScriptParserContext context, string line, bool isBeforeCode);
     }
 }
