@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Common.Logging;
 using ScriptCs.Contracts;
 
@@ -67,12 +68,10 @@ namespace ScriptCs.Command
 
                 var shouldQuit = false;
 
-                _console.CancelKeyPress += (sender, args) =>
-                {
-                    args.Cancel = shouldQuit = true;
-                };
+                // We'll handle the exiting ourselves.
+                _console.CancelKeyPress += (sender, args) => args.Cancel = true;
 
-                while (!shouldQuit)
+                while (true)
                 {
                     _console.Write(string.IsNullOrWhiteSpace(repl.Buffer) ? "> " : "* ");
 
@@ -84,13 +83,12 @@ namespace ScriptCs.Command
                         {
                             if (!shouldQuit)
                             {
-                                // First Ctrl+C
+                                shouldQuit = true;
                                 _console.WriteLine("\n(^C again to quit)");
-                                continue;
+                                continue; // First Ctrl+C
                             }
 
-                            // Second Ctrl+C
-                            break;
+                            break; // Second Ctrl+C
                         }
 
                         if (line.Trim().Length > 0)
