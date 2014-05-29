@@ -5,9 +5,15 @@ namespace ScriptCs.Hosting
 {
     public class ScriptConsole : IConsole
     {
-        public ScriptConsole()
+        private readonly bool _hookCancelKeyPress;
+
+        public ScriptConsole(bool hookCancelKeyPress = true)
         {
-            CancelKeyPress += HandleCancelKeyPress;
+            _hookCancelKeyPress = hookCancelKeyPress;
+            if (hookCancelKeyPress)
+            {
+                CancelKeyPress += HandleCancelKeyPress;
+            }
         }
 
         public event ConsoleCancelEventHandler CancelKeyPress
@@ -50,7 +56,10 @@ namespace ScriptCs.Hosting
         public void Exit()
         {
             ResetColor();
-            CancelKeyPress -= HandleCancelKeyPress;
+            if (_hookCancelKeyPress)
+            {
+                CancelKeyPress -= HandleCancelKeyPress;
+            }
         }
 
         public void ResetColor()

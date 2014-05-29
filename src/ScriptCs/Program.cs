@@ -34,7 +34,10 @@ namespace ScriptCs
 
         private static ArgumentParseResult ParseArguments(string[] args)
         {
-            var console = new ScriptConsole();
+            // We have to prevent hooking the CancelKeyPress event
+            // because of a bug in System.Console that prevents the event from firing.
+            var console = new ScriptConsole(hookCancelKeyPress: false);
+
             try
             {
                 var parser = new ArgumentHandler(new ArgumentParser(console), new ConfigFileParser(console), new FileSystem());
