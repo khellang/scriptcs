@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Common.Logging;
 using ScriptCs.Contracts;
 
@@ -66,11 +65,46 @@ namespace ScriptCs.Command
                     repl.Execute(string.Format("#load {0}", _scriptName));
                 }
 
-                while (ExecuteLine(repl))
-                {
-                }
+                var shouldQuit = false;
 
-                _console.WriteLine();
+                _console.CancelKeyPress += (sender, args) =>
+                {
+                    args.Cancel = shouldQuit = true;
+                };
+
+                while (!shouldQuit)
+                {
+                    _console.Write(string.IsNullOrWhiteSpace(repl.Buffer) ? "> " : "* ");
+
+                    try
+                    {
+                        var line = _console.ReadLine();
+
+                        if (line == null)
+                        {
+                            if (!shouldQuit)
+                            {
+                                // First Ctrl+C
+                                _console.WriteLine("\n(^C again to quit)");
+                                continue;
+                            }
+
+                            // Second Ctrl+C
+                            break;
+                        }
+
+                        if (line.Trim().Length > 0)
+                        {
+                            repl.Execute(line);
+                        }
+
+                        shouldQuit = false; // We'll reset our flag when we've executed some code.
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -80,27 +114,6 @@ namespace ScriptCs.Command
 
             repl.Terminate();
             return CommandResult.Success;
-        }
-
-        private bool ExecuteLine(Repl repl)
-        {
-            _console.Write(string.IsNullOrWhiteSpace(repl.Buffer) ? "> " : "* ");
-
-            try
-            {
-                var line = _console.ReadLine();
-
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    repl.Execute(line);
-                }
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }
