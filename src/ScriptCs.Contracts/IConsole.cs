@@ -18,6 +18,8 @@ namespace ScriptCs.Contracts
 
         void ResetColor();
 
+        event ConsoleCancelEventHandler CancelKeyPress;
+
         ConsoleColor ForegroundColor { get; set; }
     }
 }

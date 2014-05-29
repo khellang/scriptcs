@@ -7,7 +7,19 @@ namespace ScriptCs.Hosting
     {
         public ScriptConsole()
         {
-            Console.CancelKeyPress += HandleCancelKeyPress;
+            CancelKeyPress += HandleCancelKeyPress;
+        }
+
+        public event ConsoleCancelEventHandler CancelKeyPress
+        {
+            add { Console.CancelKeyPress += value; }
+            remove { Console.CancelKeyPress -= value; }
+        }
+
+        public ConsoleColor ForegroundColor
+        {
+            get { return Console.ForegroundColor; }
+            set { Console.ForegroundColor = value; }
         }
 
         public void Write(string value)
@@ -38,23 +50,17 @@ namespace ScriptCs.Hosting
         public void Exit()
         {
             ResetColor();
-            Console.CancelKeyPress -= HandleCancelKeyPress;
+            CancelKeyPress -= HandleCancelKeyPress;
         }
 
         public void ResetColor()
         {
             Console.ResetColor();
         }
-
+      
         private void HandleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             ResetColor();
-        }
-
-        public ConsoleColor ForegroundColor
-        {
-            get { return Console.ForegroundColor; }
-            set { Console.ForegroundColor = value; }
         }
     }
 }

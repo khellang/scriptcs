@@ -17,28 +17,40 @@ namespace ScriptCs.Hosting
             _innerConsole = innerConsole;
         }
 
+        public event ConsoleCancelEventHandler CancelKeyPress
+        {
+            add { _innerConsole.CancelKeyPress += value; }   
+            remove { _innerConsole.CancelKeyPress -= value; }   
+        }
+
+        public ConsoleColor ForegroundColor
+        {
+            get { return _innerConsole.ForegroundColor; }
+            set { _innerConsole.ForegroundColor = value; }
+        }
+
         public void Write(string value)
         {
             _innerConsole.Write(value);
-            this.Append(value);
+            Append(value);
         }
 
         public void WriteLine()
         {
             _innerConsole.WriteLine();
-            this.AppendLine(string.Empty);
+            AppendLine(string.Empty);
         }
 
         public void WriteLine(string value)
         {
             _innerConsole.WriteLine(value);
-            this.AppendLine(value);
+            AppendLine(value);
         }
 
         public string ReadLine()
         {
             var line = _innerConsole.ReadLine();
-            this.AppendLine(line);
+            AppendLine(line);
             return line;
         }
 
@@ -57,12 +69,6 @@ namespace ScriptCs.Hosting
             _innerConsole.ResetColor();
         }
 
-        public ConsoleColor ForegroundColor
-        {
-            get { return _innerConsole.ForegroundColor; }
-            set { _innerConsole.ForegroundColor = value; }
-        }
-
         private void Append(string text)
         {
             using (var writer = new StreamWriter(_path, true))
@@ -74,7 +80,7 @@ namespace ScriptCs.Hosting
 
         private void AppendLine(string text)
         {
-            this.Append(text + Environment.NewLine);
+            Append(text + Environment.NewLine);
         }
     }
 }
