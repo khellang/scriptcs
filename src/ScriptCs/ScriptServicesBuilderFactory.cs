@@ -25,9 +25,13 @@ namespace ScriptCs
             var scriptServicesBuilder = new ScriptServicesBuilder(console, logger)
                 .Cache(commandArgs.Cache)
                 .Debug(commandArgs.Debug)
-                .LogLevel(commandArgs.LogLevel)
                 .ScriptName(commandArgs.ScriptName)
                 .Repl(commandArgs.Repl);
+
+            if (commandArgs.LogLevel.HasValue)
+            {
+                scriptServicesBuilder.LogLevel(commandArgs.LogLevel.Value);
+            }
 
             var modules = commandArgs.Modules == null
                 ? new string[0]

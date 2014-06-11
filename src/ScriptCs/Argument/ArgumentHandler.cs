@@ -1,4 +1,5 @@
-﻿using PowerArgs;
+﻿using System.IO;
+using PowerArgs;
 using ScriptCs.Contracts;
 using System;
 using System.Linq;
@@ -36,26 +37,21 @@ namespace ScriptCs.Argument
 
         private string GetFileContent(string fileName)
         {
-            string filePath = _fileSystem.CurrentDirectory + '\\' + fileName;
-            if (_fileSystem.FileExists(filePath))
-            {
-                return _fileSystem.ReadFile(filePath);
-            }
-
-            return null;
+            var filePath = Path.Combine(_fileSystem.CurrentDirectory, fileName);
+            return _fileSystem.FileExists(filePath) ? _fileSystem.ReadFile(filePath) : null;
         }
 
         public static SplitResult SplitScriptArgs(string[] args)
         {
             Guard.AgainstNullArgument("args", args);
 
-            var result = new SplitResult() { CommandArguments = args };
+            var result = new SplitResult { CommandArguments = args };
 
             // Split the arguments list on "--".
             // The arguments before the "--" (or all arguments if there is no "--") are
             // for ScriptCs.exe, and the arguments after that are for the csx script.
-            int separatorLocation = Array.IndexOf(args, "--");
-            int scriptArgsCount = separatorLocation == -1 ? 0 : args.Length - separatorLocation - 1;
+            var separatorLocation = Array.IndexOf(args, "--");
+            var scriptArgsCount = separatorLocation == -1 ? 0 : args.Length - separatorLocation - 1;
             result.ScriptArguments = new string[scriptArgsCount];
             Array.Copy(args, separatorLocation + 1, result.ScriptArguments, 0, scriptArgsCount);
 
@@ -79,17 +75,16 @@ namespace ScriptCs.Argument
                 var commandValue = property.GetValue(commandArgs);
                 var defaultValue = GetPropertyDefaultValue(property);
 
-                if (!object.Equals(configValue, commandValue))
+                if (Equals(configValue, commandValue)) continue;
+
+                if (!Equals(commandValue, defaultValue))
                 {
-                    if (!object.Equals(commandValue, defaultValue))
-                    {
+                    property.SetValue(configArgs, commandValue);
+                }
+                else
+                {
+                    if (IsCommandLinePresent(splitResult.CommandArguments, property))
                         property.SetValue(configArgs, commandValue);
-                    }
-                    else
-                    {
-                        if (IsCommandLinePresent(splitResult.CommandArguments, property))
-                            property.SetValue(configArgs, commandValue);
-                    }
                 }
             }
 
@@ -103,7 +98,7 @@ namespace ScriptCs.Argument
             var attribute = property.GetCustomAttribute<ArgShortcut>();
 
             if (attribute != null)
-                attributeFound = args.Any(a => a.Contains("-" + (attribute as ArgShortcut).Shortcut));
+                attributeFound = args.Any(a => a.Contains("-" + attribute.Shortcut));
 
             var result = args.Any(a => a.Contains("-" + property.Name)) || attributeFound;
             return result;
@@ -114,7 +109,7 @@ namespace ScriptCs.Argument
             var defaultAttribute = property.GetCustomAttribute<DefaultValueAttribute>();
 
             return defaultAttribute != null
-                       ? ((PowerArgs.DefaultValueAttribute)defaultAttribute).Value
+                       ? defaultAttribute.Value
                        : property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
         }
 

@@ -13,9 +13,9 @@ namespace ScriptCs.Hosting
 
         private ILog _logger;
 
-        public LoggerConfigurator(LogLevel logLevel)
+        public LoggerConfigurator(LogLevel? logLevel)
         {
-            _logLevel = logLevel;
+            _logLevel = logLevel ?? LogLevel.Info;
         }
 
         public void Configure(IConsole console)

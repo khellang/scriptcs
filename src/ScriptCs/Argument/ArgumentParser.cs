@@ -37,7 +37,7 @@ namespace ScriptCs.Argument
 
                 commandArgs = Args.Parse<ScriptCsArgs>(args);
 
-                if (commandArgs.Debug)
+                if (!commandArgs.LogLevel.HasValue && commandArgs.Debug)
                 {
                     commandArgs.LogLevel = LogLevel.Debug;
                 }
